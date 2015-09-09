@@ -1,0 +1,114 @@
+/*
+ * Author : Anand Krishnamoorthy
+ * */
+
+public class charRev {
+	
+	public static void main(String args[]){
+		
+		char[] inputwithspace;
+		char[] input;
+		char temp;
+		int j=0,k=0,ascii=0;
+		int part_ct=0;
+		/*Part Count ---Gonna separate the input char array part by part based on leading and trailing spaces 
+		 * and reverse the word in alternate part
+		 * when part_ct = 0 it is odd word
+		 * when part_ct = 1 it is even word
+		 * */
+		int fir_sp=0;//Fist Space of part 
+		int sec_sp=0;//Second Space of part
+		
+		
+		inputwithspace = "Hi Anand ! How  are you ? are you fine ?.".toCharArray();
+		input = removeExtraSpaces(inputwithspace);
+		
+		for(int i=0;i<input.length;i++){
+			ascii = input[i]; //getting ASCII value of each letters in the input array
+			if(ascii==32 && part_ct==0){ // ACII value of space is 32 ...getting the index of char after the space
+				part_ct++;	//to avoid conflict in finding the trailing space 
+				fir_sp=i;	//getting the index value  
+				ascii=0;	//to find the next space's ascii value
+			}
+			
+			if(ascii==32 || ascii ==46 && part_ct==1){	// ACII value of . is 46 ...getting the index of char after the space or .
+				part_ct = 0; //refreshing the part count
+				sec_sp=i;	//getting the index value
+			}
+			
+			/*
+			 * Now a word is obtained from an alternateve parts
+			 * j points starting char of a word and k points end char of a word  
+			 * and then I gonna swap j and k to provide word reversing
+			 * */
+			
+			for(k=sec_sp -1,j=fir_sp +1; k>fir_sp ; k--,j++){
+				
+				//swapping starts
+				temp=input[j];
+				input[j]=input[k];
+				input[k]=temp;
+				//swapping ends
+				
+				/*Swapping should be terminated when j==k or k>j (i.e., half of the word) 
+				 * or else characters in the word will swapped twice to provide same input word
+				 * */
+				if(j==k || k>j){
+					fir_sp=0;
+					sec_sp=0;
+					break;
+				}
+			}
+		}
+		System.out.println(input);
+			
+	}
+	
+	public static char[] removeExtraSpaces(char[] input){
+		char[] inp=null;	//Char Array without any extra spaces will be stored
+		int ascii=0,j,k=0;
+		int scount=0;	//extra Space Count
+		int lcount=1;	//Char or letter count
+		boolean sFlag=false;	//start flag ..kind of lock to keep track of first letter of each word...useful while System.ArrayCopy()
+		char[] temp = new char[input.length];	
+		for(int i=0;i<input.length;i++){
+			ascii=input[i];
+			if(!sFlag){
+				k=i;	//k will keep track of first letter of each word
+				sFlag=true;
+			}
+			if(ascii==32 || ascii==46){		//On reaching very first space after a word or end of line '.'
+				System.arraycopy(input,k,temp,k-scount,lcount);	//copying the word with very first space from input[] to temp[]
+				// Refreshing/ resetting lock and char count to get next word 
+				sFlag=false;
+				lcount=1;
+				// Refresing ends
+				/*
+				 * After reaching very first space after a word get next char and check if it is space or letter
+				 * if its is space increment extra Space Count variable scount
+				 * else break 
+				 * */
+				for(j=i+1;j<input.length;j++){ //get next char after very first space
+					ascii=input[j];
+					if(ascii!=32 && ascii!=46){	//Checking space or a char
+						i=j-1;
+						break;
+					}else
+						scount++;	//increment extra Space Count variable scount
+				}
+				/*
+				 * Check if we reached the last char of the input
+				 * if yes the copy the contents from temp[] to new char array by replacing the trailing spaces with end of line '.'
+				 * */
+				if(j==input.length){
+					inp = new char[input.length-scount];	//Creating char array of size without any spaces
+					System.arraycopy(temp, 0, inp, 0, input.length-scount);
+					inp[inp.length-1]='.';	//replacing the trailing spaces with end of line '.'
+					break;
+				}
+			}else
+				lcount++;
+		}
+		return inp;
+	}
+}
